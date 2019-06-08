@@ -70,6 +70,8 @@ _UFC stands for Uncomplicated firewall_
   123 (v6)                   ALLOW       Anywhere (v6)    1. 
   ```
 
+### 5. Test the configuration
+1. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@18.196.59.21 -p 2200`
 
 ## Setup the user management
 
