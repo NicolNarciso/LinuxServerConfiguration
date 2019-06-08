@@ -21,9 +21,9 @@ FSWD Linux Server Configuration
 ## Setup the security
 ### 1. Enforce key-based SSH authentication
 Enable SSH connection from the local machine to the AWS lightsale instance with RSA key authentication
-* Download RSA SSH key file `LightsailDefaultKey-eu-central-1.pem` from the AWS user account website.
-* Optional: Restrict the read and write permission for the key file: `$ chmod 600 LightsailDefaultKey-eu-central-1.pem`.
-* Open SSH from the local machine.
+1. Download RSA SSH key file `LightsailDefaultKey-eu-central-1.pem` from the AWS user account website.
+2. Optional: Restrict the read and write permission for the key file: `$ chmod 600 LightsailDefaultKey-eu-central-1.pem`.
+3. Open SSH from the local machine.
   * Open new terminal from the folder that contains the downloaded key file.
   * Open SSH connection to the virtual server usind the key-based authentication: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@18.196.59.21`.
 
@@ -45,7 +45,7 @@ All system packages needs to be updated to most recent versions.
 
 ### 4. Configure the ubuntu firewall
 The UFC firewall shall only allow SSH, HTTP, and NTP. 
->_UFC stands for Uncomplicated firewall_
+_UFC stands for Uncomplicated firewall_
 
 * Check the current status of the firewall: `$ sudo ufw status`.
 * Disable all ports for incoming requests: `$ sudo ufw default deny incoming`.
