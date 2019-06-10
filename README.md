@@ -160,7 +160,7 @@ _UFC stands for Uncomplicated firewall_
  |  .oo ..+Eoo.    |
  +----[SHA256]-----+
   ```
-* Check the created files: $ la
+* Check the created files: `$ la
 ```
 grader@ip-172-26-10-105:~/.ssh$ la
 .newkey.pub.swp               authorized_keys      rsa_key_user_grader.pub
@@ -205,4 +205,33 @@ grader@3.121.207.106: Permission denied (publickey).
 * Restart the SSH service: `$ sudo service ssh restart`or `$ sudo reboot`
 * Close connection: `$ exit`
 * Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@3.121.207.106 -p 2200
+
+## Get the web application running
+### 1. Install the required packages
+* Install Python 3.7 or later: `$ sudo apt-get install python3`.
+* Install PIP: `sudo apt-get install python-pip`.
+* Install PostgreSQL server: `$ sudo apt-get install postgresql`.
+* Start PostgreSQL server as a permanent service: `$ sudo service postgresql start`.
+* Install SQLAlchemy database toolkit: `$ pip install sqlalchemy`.
+* Install Flask web development framework: `$ pip install flask`.
+* Install OAuth2 client for Google sign in: `$ pip install oauth2client`.
+* Install Httplib2 to access HTTP Layer: `$ pip install httplib2`.
+* Install git: `$ sudo apt-get install git-core`.
+* Install Apache webserver: 
+
+### 2. Test Apache web server
+* Open the following site on your local web browser: `http://3.121.207.106:80` 
+ If the web server is running, the `Apache2 Ubuntu Default Page` is displayed.
+
+### 3. Clone the ItemCatalog from github to the server
+* `$ cd /home/grader`
+* `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
+
+### 4. Configure the web application
+* Open the project folder `$ cd /home/grader/ItemCatalog`.
+* Open the project.py file: `$ nano project.py`.
+* Change server ip and port: from `app.run(host='0.0.0.0', port=8000)` to `app.run(host='3.121.207.106', port=80)`.
+
+### 5. Run the web application
+* Launch application: `$ python project.py`.
 
