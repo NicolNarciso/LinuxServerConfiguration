@@ -123,7 +123,47 @@ _UFC stands for Uncomplicated firewall_
  root@ip-172-26-10-105:~# 
  ```
 ### 2. Create key-based login for the new user
-
-
-
+* Login as the new user: `$ su grader`.
+* Open the new users home folder: `$ cd /home/grader`.
+* Check if the folder ".ssh" exists: `$ la`.
+* If not, create new folder ".ssh": `$ mkdir .ssh`.
+* Check if the folder was created: `$ la`.
+ ```
+ grader@ip-172-26-10-105:~$ la
+ .bash_history  .bash_logout  .bashrc  .profile  .ssh  .sudo_as_admin_successful
+ ```
+* Open the .ssh folder: `$ cd .ssh`.
+* Create new file "authorized_keys": `$ touch authorized_keys`.
+* Setup folder permission: `$ sudo chmod 0700 /home/grader/.ssh`.
+* Setup file permission: `$ sudo chmod 0644 /home/grader/.ssh/authorized_keys`
+* Create new SSH keys: `$ ssh-keygen -t rsa -b 4096
+ ```
+ grader@ip-172-26-10-105:~/.ssh$ ssh-keygen -t rsa -b 4096
+ Generating public/private rsa key pair.
+ Enter file in which to save the key (/home/grader/.ssh/id_rsa): newkey  
+ Enter passphrase (empty for no passphrase): 
+ Enter same passphrase again: 
+ Your identification has been saved in newkey.
+ Your public key has been saved in newkey.pub.
+ The key fingerprint is:
+ SHA256:e/8cpTylUz5QJGxKgnvF8aRw47CafC500j5B9KFI4nY grader@ip-172-26-10-105
+ The key's randomart image is:
+ +---[RSA 4096]----+
+ |     . ..+.=oo . |
+ |    . o.o.O+*oo  |
+ |     o E.+++o. . |
+ |    . o.=. .  .  |
+ |       *S=   .  +|
+ |      . *..  ..B |
+ |       ..+.   B..|
+ |        .... . +.|
+ |            ..o  |
+ +----[SHA256]-----+
+ ```
+* Copy the public key from the generated file "newkey.pub": `$ sudo vim newkey.pub`.
+ ```
+ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPLnNq10evj38k1WtHvKzaUtZYL+vfQgqkMtVNbLO+W34EpsDwaWMj7KuZnY5FXIMijh2Gb+vAFrhk5JIZPDcJ/1OBuF8MmcWbvLfUu0jJClydtLXd+JjMDqA3zGX2gQAnPmd7K5St7OsieIgKrE1hOgiyubLfIimu/gSaWZnBVJ14/3OfIMUsQ7t2ja+scUZnt4eBF1zHbp1up7sTXhAWdN+BXbHtc3rlmywb70se5h1PJmpROvwDqRlO1EGBGzgwbTkH7aJU9h19uyd4S0lvFTpewO1SRkw6Xy3Vjd92WCr8A9wfnlU9YCyf2i/+pWqH69DudtPf+WS9KvMP3G7U6aEvB7Iq0+Rv2AF9NFpEdIbYR2NociCuUMxECVN6AqQ1aWovhqyDkBYukIcr/cr2ukTBKx9wjbrw+ifjpmjt9MI87wfhdMbQmgvcsoXCfmcktZYLvuSurhG7JzvWz0R1ANuemfb7BwcLw95vZ3OCGc8VKG0DEdEkb4t41ClIRm4wy+7Q94On0Sx8uKByQmeJRBJIv8I/smwJJKFe90LPO86c0OjoIxKcLtMWItq0Rss+DIS4nDDdijeSKv79J+Vjug2DJae8YDngtm++u7HVJA+KOZikscSVa1744SLWUrx+bvU6cTNv5QBcCuxFyUSuOrtk0uM7GVacD87fyXLXVw== grader@ip-172-26-10-105
+ ```
+* Paste the copied key into the file "authorized_keys": $ sudo vim authorized_keys
+* Save the file "authorized_keys": `Esc` and then `:`
 ### 4. Disable remote root login
