@@ -209,15 +209,15 @@ grader@3.121.207.106: Permission denied (publickey).
 ## Get the web application running
 ### 1. Install the required packages
 * Install Python 3.7 or later: `$ sudo apt-get install python3`.
-* Install PIP: `sudo apt-get install python-pip`.
+* Install PIP for python3: `$ sudo apt install python3-pip`.
 * Install PostgreSQL server: `$ sudo apt-get install postgresql`.
 * Start PostgreSQL server as a permanent service: `$ sudo service postgresql start`.
-* Install SQLAlchemy database toolkit: `$ pip install sqlalchemy`.
-* Install Flask web development framework: `$ pip install flask`.
-* Install OAuth2 client for Google sign in: `$ pip install oauth2client`.
-* Install Httplib2 to access HTTP Layer: `$ pip install httplib2`.
+* Install SQLAlchemy database toolkit: `$ pip3 install sqlalchemy`.
+* Install Flask web development framework: `$ pip3 install flask`.
+* Install OAuth2 client for Google sign in: `$ pip3 install oauth2client`.
+* Install Httplib2 to access HTTP Layer: `$ pip3 install httplib2`.
 * Install git: `$ sudo apt-get install git-core`.
-* Install Apache webserver: 
+* Install Apache webserver: `$ sudo apt-get install apache2`
 
 ### 2. Test Apache web server
 * Open the following site on your local web browser: `http://3.121.207.106:80` 
