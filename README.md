@@ -140,30 +140,46 @@ _UFC stands for Uncomplicated firewall_
  ```
  grader@ip-172-26-10-105:~/.ssh$ ssh-keygen -t rsa -b 4096
  Generating public/private rsa key pair.
- Enter file in which to save the key (/home/grader/.ssh/id_rsa): newkey  
+ Enter file in which to save the key (/home/grader/.ssh/id_rsa): rsa_key_user_grader
  Enter passphrase (empty for no passphrase): 
  Enter same passphrase again: 
- Your identification has been saved in newkey.
- Your public key has been saved in newkey.pub.
+ Your identification has been saved in rsa_key_user_grader.
+ Your public key has been saved in rsa_key_user_grader.pub.
  The key fingerprint is:
- SHA256:e/8cpTylUz5QJGxKgnvF8aRw47CafC500j5B9KFI4nY grader@ip-172-26-10-105
+ SHA256:8ukPYi22JNZ//ABoP0vNOyJBySOmSr+2dbfA8bDc8bI grader@ip-172-26-10-105
  The key's randomart image is:
  +---[RSA 4096]----+
- |     . ..+.=oo . |
- |    . o.o.O+*oo  |
- |     o E.+++o. . |
- |    . o.=. .  .  |
- |       *S=   .  +|
- |      . *..  ..B |
- |       ..+.   B..|
- |        .... . +.|
- |            ..o  |
+ |                 |
+ |                 |
+ |     . .         |
+ |    o =.         |
+ |   o o++S.       |
+ | ..  o+=*=o      |
+ |... o.BBO*+.     |
+ |.  +.=oB++Bo     |
+ |  .oo ..+Eoo.    |
  +----[SHA256]-----+
- ```
-* Copy the public key from the generated file "newkey.pub": `$ sudo vim newkey.pub`.
- ```
- ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPLnNq10evj38k1WtHvKzaUtZYL+vfQgqkMtVNbLO+W34EpsDwaWMj7KuZnY5FXIMijh2Gb+vAFrhk5JIZPDcJ/1OBuF8MmcWbvLfUu0jJClydtLXd+JjMDqA3zGX2gQAnPmd7K5St7OsieIgKrE1hOgiyubLfIimu/gSaWZnBVJ14/3OfIMUsQ7t2ja+scUZnt4eBF1zHbp1up7sTXhAWdN+BXbHtc3rlmywb70se5h1PJmpROvwDqRlO1EGBGzgwbTkH7aJU9h19uyd4S0lvFTpewO1SRkw6Xy3Vjd92WCr8A9wfnlU9YCyf2i/+pWqH69DudtPf+WS9KvMP3G7U6aEvB7Iq0+Rv2AF9NFpEdIbYR2NociCuUMxECVN6AqQ1aWovhqyDkBYukIcr/cr2ukTBKx9wjbrw+ifjpmjt9MI87wfhdMbQmgvcsoXCfmcktZYLvuSurhG7JzvWz0R1ANuemfb7BwcLw95vZ3OCGc8VKG0DEdEkb4t41ClIRm4wy+7Q94On0Sx8uKByQmeJRBJIv8I/smwJJKFe90LPO86c0OjoIxKcLtMWItq0Rss+DIS4nDDdijeSKv79J+Vjug2DJae8YDngtm++u7HVJA+KOZikscSVa1744SLWUrx+bvU6cTNv5QBcCuxFyUSuOrtk0uM7GVacD87fyXLXVw== grader@ip-172-26-10-105
- ```
-* Paste the copied key into the file "authorized_keys": $ sudo vim authorized_keys
-* Save the file "authorized_keys": `Esc` and then `:`
+  ```
+* Check the created files: $ la
+```
+grader@ip-172-26-10-105:~/.ssh$ la
+.newkey.pub.swp               authorized_keys      rsa_key_user_grader.pub
+.rsa_key_user_grader.pub.swp  rsa_key_user_grader
+```
+* Copy the public key from the generated file "newkey.pub": `$ sudo vim rsa_key_user_grader.pub`.
+* Paste the copied key into the file "authorized_keys": `$ sudo nano authorized_keys`.
+* Copy the private key from the generated file "newkey": `$ sudo vim rsa_key_user_grader`.
+* Paste the private key to the local machine: `$ sudo nano rsa_key_user_grader`.
+* Restart the SSH service: `$ sudo service ssh restart`or `$ sudo reboot`
+* Close connection: `$ exit`
+* Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@3.121.207.106 -p 2200
+
 ### 4. Disable remote root login
+* Open SSH server config file: `$ sudo nano /etc/ssh/sshd_config`.
+* Disable SSH root login by editing the file: `#PermitRootLogin prohibit-password`to `PermitRootLogin no
+* Disable SSH password authentication: `#PasswordAuthentication yes` to `PasswordAuthentication no`
+* Save file: `[option^]+[X]`
+* Restart the SSH service: `$ sudo service ssh restart`or `$ sudo reboot`
+* Close connection: `$ exit`
+* Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@3.121.207.106 -p 2200
+
