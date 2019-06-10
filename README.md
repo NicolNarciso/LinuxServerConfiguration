@@ -167,9 +167,32 @@ grader@ip-172-26-10-105:~/.ssh$ la
 .rsa_key_user_grader.pub.swp  rsa_key_user_grader
 ```
 * Copy the public key from the generated file "newkey.pub": `$ sudo vim rsa_key_user_grader.pub`.
+ Public keys look like this: `ssh-rsa ........................................== grader@ip-172-26-10-105`
 * Paste the copied key into the file "authorized_keys": `$ sudo nano authorized_keys`.
 * Copy the private key from the generated file "newkey": `$ sudo vim rsa_key_user_grader`.
+ Private keys look like this: 
+ ```
+ -----BEGIN RSA PRIVATE KEY-----
+ .....................................
+ .....................................
+ .....................................
+ .....................................
+ .....................................
+ ...................................==
+ -----END RSA PRIVATE KEY-----
+ ```
 * Paste the private key to the local machine: `$ sudo nano rsa_key_user_grader`.
+* Change the permission of file "rsa_key_user_grader" on the local machine, so that only the active user can access the file. If the file permission is wrong, then the following error will occur while connecting:
+ ```
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Permissions 0644 for 'rsa_key_user_grader' are too open.
+It is required that your private key files are NOT accessible by others.
+This private key will be ignored.
+Load key "rsa_key_user_grader": bad permissions
+grader@3.121.207.106: Permission denied (publickey).
+```
 * Restart the SSH service: `$ sudo service ssh restart`or `$ sudo reboot`
 * Close connection: `$ exit`
 * Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@3.121.207.106 -p 2200
