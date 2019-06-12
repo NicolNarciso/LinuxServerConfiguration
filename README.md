@@ -46,7 +46,8 @@ All system packages needs to be updated to most recent versions.
   * Restart SSH service: `$ sudo service sshd restart`
   
 ### 4. Test the configuration
-1. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@52.59.65.120 -p 2200`
+1. Restart the virtual server: `$ sudo reboot`.
+2. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@52.59.65.120 -p 2200`.
 
 ### 5. Configure the ubuntu firewall
 The UFC firewall shall only allow SSH, HTTP, and NTP. 
@@ -75,7 +76,8 @@ _UFC stands for Uncomplicated firewall_
   ```
 
 ### 6. Test the configuration
-1. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@52.59.65.120 -p 2200`
+1. Restart the virtual server: `$ sudo reboot`.
+2. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@52.59.65.120 -p 2200`
 
 ## Setup the user management
 
@@ -129,8 +131,8 @@ _UFC stands for Uncomplicated firewall_
 * If not, create new folder ".ssh": `$ mkdir .ssh`.
 * Check if the folder was created: `$ la`.
  ```
- grader@ip-172-26-10-105:~$ la
- .bash_history  .bash_logout  .bashrc  .profile  .ssh  .sudo_as_admin_successful
+ grader@ip-172-26-0-126:~$ la
+ .bash_logout  .bashrc  .profile  .ssh  .sudo_as_admin_successful
  ```
 * Open the .ssh folder: `$ cd .ssh`.
 * Create new file "authorized_keys": `$ touch authorized_keys`.
@@ -138,7 +140,7 @@ _UFC stands for Uncomplicated firewall_
 * Setup file permission: `$ sudo chmod 0644 /home/grader/.ssh/authorized_keys`
 * Create new SSH keys: `$ ssh-keygen -t rsa -b 4096
  ```
- grader@ip-172-26-10-105:~/.ssh$ ssh-keygen -t rsa -b 4096
+ grader@ip-172-26-0-126:~/.ssh$ ssh-keygen -t rsa -b 4096
  Generating public/private rsa key pair.
  Enter file in which to save the key (/home/grader/.ssh/id_rsa): rsa_key_user_grader
  Enter passphrase (empty for no passphrase): 
@@ -146,25 +148,24 @@ _UFC stands for Uncomplicated firewall_
  Your identification has been saved in rsa_key_user_grader.
  Your public key has been saved in rsa_key_user_grader.pub.
  The key fingerprint is:
- SHA256:8ukPYi22JNZ//ABoP0vNOyJBySOmSr+2dbfA8bDc8bI grader@ip-172-26-10-105
+ SHA256:lV76salRf8Bec6eSj41QfYCucejKg3jW+4ezzuzopiU grader@ip-172-26-0-126
  The key's randomart image is:
  +---[RSA 4096]----+
  |                 |
- |                 |
- |     . .         |
- |    o =.         |
- |   o o++S.       |
- | ..  o+=*=o      |
- |... o.BBO*+.     |
- |.  +.=oB++Bo     |
- |  .oo ..+Eoo.    |
+ |           . .   |
+ |          o o .  |
+ |         o = o . |
+ |        S = * +.=|
+ |         . B B =+|
+ |     .Eo. =.* + .|
+ |    . +++=o+.* . |
+ |     o.+**O+o o  |
  +----[SHA256]-----+
-  ```
+ ```
 * Check the created files: `$ la
 ```
-grader@ip-172-26-10-105:~/.ssh$ la
-.newkey.pub.swp               authorized_keys      rsa_key_user_grader.pub
-.rsa_key_user_grader.pub.swp  rsa_key_user_grader
+grader@ip-172-26-0-126:~/.ssh/authorized_keys$ la
+rsa_key_user_grader  rsa_key_user_grader.pub
 ```
 * Copy the public key from the generated file "newkey.pub": `$ sudo vim rsa_key_user_grader.pub`.
  Public keys look like this: `ssh-rsa ........................................== grader@ip-172-26-10-105`
@@ -208,15 +209,79 @@ grader@52.59.65.120: Permission denied (publickey).
 
 ## Get the web application running
 ### 1. Install the required packages
-* Install Python 3.7 or later: `$ sudo apt-get install python3`.
+### 1. Set up Python
+* Install Python 3.x or later: `$ sudo apt-get install python3`.
+* Check python version: `$ python --version`.
+ ```
+ grader@ip-172-26-0-126:~$ python --version
+ Python 3.6.8
+ ```
 * Install PIP for python3: `$ sudo apt install python3-pip`.
+* Install virtual enironments for python: `$ pip3 install virtualenv`.
+
+### 3. Clone the ItemCatalog from github to the server
+* Install git: `$ sudo apt-get install git-core`.
+* `$ cd /home/grader`
+* `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
+
+### 4. Create virtual environment
+* Open project folder. `$ cd /home/grader/ItemCatalog`.
+* Create virtual environment: `$ virtualenv -p python3 venv`
+  ```
+  grader@ip-172-26-0-126:~/ItemCatalog$ virtualenv -p python3 venv
+  Already using interpreter /usr/bin/python3
+  Using base prefix '/usr'
+  New python executable in /home/grader/ItemCatalog/venv/bin/python3
+  Also creating executable in /home/grader/ItemCatalog/venv/bin/python
+  Installing setuptools, pip, wheel...
+  done.
+  ```
+ * Activate the virtual environment: `$ source venv/bin/activate`.
+  ```
+ grader@ip-172-26-0-126:~/ItemCatalog$ source venv/bin/activate
+ (venv) grader@ip-172-26-0-126:~/ItemCatalog$
+ ```
+ * Check if the correct virtual environement is active: `$ which python3´.
+  ```
+  (venv) grader@ip-172-26-0-126:~/ItemCatalog$ which python3
+ /home/grader/ItemCatalog/venv/bin/python3
+ ```
+ 
+ 
+`$ sudo apt-get install apache2 to install apache`
+`$ sudo apt-get install python-setuptools libapache2-mod-wsgi`
+`$ sudo service apache2 start`
+
+
+`sudo nano /etc/apache2/sites-available/catalog.conf`
+```
+<VirtualHost *:80>
+    ServerName Public-IP-Address
+    ServerAdmin admin@Public-IP-Address
+    WSGIScriptAlias / /var/www/catalog/catalog.wsgi
+    <Directory /var/www/catalog/catalog/>
+        Order allow,deny
+        Allow from all
+    </Directory>
+    Alias /static /var/www/catalog/catalog/static
+    <Directory /var/www/catalog/catalog/static/>
+        Order allow,deny
+        Allow from all
+    </Directory>
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    LogLevel warn
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+
 * Install PostgreSQL server: `$ sudo apt-get install postgresql`.
 * Start PostgreSQL server as a permanent service: `$ sudo service postgresql start`.
 * Install SQLAlchemy database toolkit: `$ pip3 install sqlalchemy`.
 * Install Flask web development framework: `$ pip3 install flask`.
 * Install OAuth2 client for Google sign in: `$ pip3 install oauth2client`.
 * Install Httplib2 to access HTTP Layer: `$ pip3 install httplib2`.
-* Install git: `$ sudo apt-get install git-core`.
+
 * Install Apache webserver: `$ sudo apt-get install apache2`
 
 ### 2. Test Apache web server
