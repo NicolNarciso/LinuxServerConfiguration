@@ -14,7 +14,7 @@ FSWD Linux Server Configuration
 * Wait until the instance status changes form pending to running.
 
 ## 3. My virtual server
-* Public IP-Address of the server instance: `3.121.207.106`.
+* Public IP-Address of the server instance: `52.59.65.120`.
 * Initial user name: `ubuntu`.
 
 ## Setup the security
@@ -24,7 +24,7 @@ Enable SSH connection from the local machine to the AWS lightsale instance with 
 2. Restrict the read and write permission for the key file: `$ chmod 600 LightsailDefaultKey-eu-central-1.pem`. It is required that your private key files are NOT accessible by others.
 3. Open SSH from the local machine.
   * Open new terminal from the folder that contains the downloaded key file.
-  * Open SSH connection to the virtual server usind the key-based authentication: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@3.121.207.106`.
+  * Open SSH connection to the virtual server usind the key-based authentication: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@52.59.65.120`.
 
 ### 2. Update the system
 All system packages needs to be updated to most recent versions.
@@ -46,7 +46,7 @@ All system packages needs to be updated to most recent versions.
   * Restart SSH service: `$ sudo service sshd restart`
   
 ### 4. Test the configuration
-1. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@3.121.207.106 -p 2200`
+1. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@52.59.65.120 -p 2200`
 
 ### 5. Configure the ubuntu firewall
 The UFC firewall shall only allow SSH, HTTP, and NTP. 
@@ -75,7 +75,7 @@ _UFC stands for Uncomplicated firewall_
   ```
 
 ### 6. Test the configuration
-1. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@3.121.207.106 -p 2200`
+1. Open SSH connection on port 2200: `$ ssh -i LightsailDefaultKey-eu-central-1.pem ubuntu@52.59.65.120 -p 2200`
 
 ## Setup the user management
 
@@ -191,11 +191,11 @@ Permissions 0644 for 'rsa_key_user_grader' are too open.
 It is required that your private key files are NOT accessible by others.
 This private key will be ignored.
 Load key "rsa_key_user_grader": bad permissions
-grader@3.121.207.106: Permission denied (publickey).
+grader@52.59.65.120: Permission denied (publickey).
 ```
 * Restart the SSH service: `$ sudo service ssh restart`or `$ sudo reboot`
 * Close connection: `$ exit`
-* Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@3.121.207.106 -p 2200
+* Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@52.59.65.120 -p 2200
 
 ### 4. Disable remote root login
 * Open SSH server config file: `$ sudo nano /etc/ssh/sshd_config`.
@@ -204,7 +204,7 @@ grader@3.121.207.106: Permission denied (publickey).
 * Save file: `[option^]+[X]`
 * Restart the SSH service: `$ sudo service ssh restart`or `$ sudo reboot`
 * Close connection: `$ exit`
-* Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@3.121.207.106 -p 2200
+* Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@52.59.65.120 -p 2200
 
 ## Get the web application running
 ### 1. Install the required packages
@@ -220,7 +220,7 @@ grader@3.121.207.106: Permission denied (publickey).
 * Install Apache webserver: `$ sudo apt-get install apache2`
 
 ### 2. Test Apache web server
-* Open the following site on your local web browser: `http://3.121.207.106:80` 
+* Open the following site on your local web browser: `http://52.59.65.120:80` 
  If the web server is running, the `Apache2 Ubuntu Default Page` is displayed.
 
 ### 3. Clone the ItemCatalog from github to the server
@@ -230,7 +230,7 @@ grader@3.121.207.106: Permission denied (publickey).
 ### 4. Configure the web application
 * Open the project folder `$ cd /home/grader/ItemCatalog`.
 * Open the project.py file: `$ nano project.py`.
-* Change server ip and port: from `app.run(host='0.0.0.0', port=8000)` to `app.run(host='3.121.207.106', port=80)`.
+* Change server ip and port: from `app.run(host='0.0.0.0', port=8000)` to `app.run(host='52.59.65.120', port=80)`.
 
 ### 5. Run the web application
 * Launch application: `$ python project.py`.
