@@ -341,15 +341,6 @@ To activate the new configuration, you need to run:
 ### 13. Test the configuration
 * Open website in browser: `http://52.59.65.120.xip.io`
 
-
-
-### 8. Configure the web application
-* Open the project folder `$ cd /home/grader/ItemCatalog`.
-* Open the project.py file: `$ nano project.py`.
-* Change server ip and port: from `app.run(host='0.0.0.0', port=8000)` to `app.run(host='52.59.65.120', port=80)`.
-
-### . Run the web application
-* Launch application: `$ python project.py`.
 :-(
 ```
 Internal Server Error
