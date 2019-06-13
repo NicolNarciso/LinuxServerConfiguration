@@ -208,8 +208,17 @@ grader@52.59.65.120: Permission denied (publickey).
 * Connect as "grader" using rsa authentication: `$ ssh -i rsa_key_user_grader grader@52.59.65.120 -p 2200
 
 ## Get the web application running
-### 1. Install the required packages
-### 1. Set up Python
+### 1. Install Apache2 webserver
+* Install Apache webserver: `$ sudo apt-get install apache2`
+`$ sudo apt-get install python-setuptools libapache2-mod-wsgi`
+`$ sudo service apache2 start`
+### 2. Test Apache web server
+* Open the following site on your local web browser: `http://52.59.65.120:80` 
+ If the web server is running, the `Apache2 Ubuntu Default Page` is displayed.
+### 3. Install Postgres SQL server
+* Install PostgreSQL server: `$ sudo apt-get install postgresql`.
+* Start PostgreSQL server as a permanent service: `$ sudo service postgresql start`.
+### 4. Install Python
 * Install Python 3.x or later: `$ sudo apt-get install python3`.
 * Check python version: `$ python --version`.
  ```
@@ -219,84 +228,138 @@ grader@52.59.65.120: Permission denied (publickey).
 * Install PIP for python3: `$ sudo apt install python3-pip`.
 * Install virtual enironments for python: `$ pip3 install virtualenv`.
 
-### 3. Clone the ItemCatalog from github to the server
+### 5. Clone the ItemCatalog from github to the server
 * Install git: `$ sudo apt-get install git-core`.
-* `$ cd /home/grader`
-* `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
+* Open Apache default folder: `$ cd /var/www/`.
+* Create new forlder for the flask apps: `$ sudo mkdir FlaskApp`.
+* Download/Clone the ItemCatalog app from git: `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
 
-### 4. Create virtual environment
-* Open project folder. `$ cd /home/grader/ItemCatalog`.
-* Create virtual environment: `$ virtualenv -p python3 venv`
+### 6. Create virtual environment
+* Open project folder: `$ cd /var/www/FlaskApp/ItemCatalog`.
+* Give write access to the folder: `$ sudo chown -R grader:grader /var/www/FlaskApp/ItemCatalog`
+* Create virtual environment: `$ sudo virtualenv -p python3 venv`
   ```
-  grader@ip-172-26-0-126:~/ItemCatalog$ virtualenv -p python3 venv
+  grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ virtualenv -p python3 venv
   Already using interpreter /usr/bin/python3
   Using base prefix '/usr'
-  New python executable in /home/grader/ItemCatalog/venv/bin/python3
-  Also creating executable in /home/grader/ItemCatalog/venv/bin/python
+  New python executable in /var/www/FlaskApp/ItemCatalog/venv/bin/python3
+  Also creating executable in /var/www/FlaskApp/ItemCatalog/venv/bin/python
   Installing setuptools, pip, wheel...
   done.
   ```
  * Activate the virtual environment: `$ source venv/bin/activate`.
   ```
  grader@ip-172-26-0-126:~/ItemCatalog$ source venv/bin/activate
- (venv) grader@ip-172-26-0-126:~/ItemCatalog$
+ (venv) grader@ip-172-26-0-126:~/ItemCatalog$ 
  ```
- * Check if the correct virtual environement is active: `$ which python3´.
-  ```
-  (venv) grader@ip-172-26-0-126:~/ItemCatalog$ which python3
- /home/grader/ItemCatalog/venv/bin/python3
+ * Check if the correct virtual environement is active: `$ which python´.
+ ```
+ (venv) grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ which python
+ /var/www/FlaskApp/ItemCatalog/venv/bin/python
+ (venv) grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ 
  ```
  
- 
-`$ sudo apt-get install apache2 to install apache`
-`$ sudo apt-get install python-setuptools libapache2-mod-wsgi`
-`$ sudo service apache2 start`
+ ### 7. Install python packages
+* Install SQLAlchemy database toolkit: `$ pip install sqlalchemy`.
+* Install Flask web development framework: `$ pip install flask`.
+* Install OAuth2 client for Google sign in: `$ pip install oauth2client`.
+* Install Httplib2 to access HTTP Layer: `$ pip install httplib2`.
+* Install Requests for easy HTTP messages: `$ pip install requests`.
 
 
-`sudo nano /etc/apache2/sites-available/catalog.conf`
+### 8. Configure the virtual apache host
+`sudo nano /etc/apache2/sites-available/ItemCatalog.conf`
 ```
 <VirtualHost *:80>
-    ServerName Public-IP-Address
-    ServerAdmin admin@Public-IP-Address
-    WSGIScriptAlias / /var/www/catalog/catalog.wsgi
-    <Directory /var/www/catalog/catalog/>
-        Order allow,deny
-        Allow from all
-    </Directory>
-    Alias /static /var/www/catalog/catalog/static
-    <Directory /var/www/catalog/catalog/static/>
-        Order allow,deny
-        Allow from all
-    </Directory>
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    LogLevel warn
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+   ServerName 52.59.65.120
+   ServerAlias 52.59.65.120.xip.io
+   ServerAdmin nici@nici.com
+   WSGIScriptAlias / /var/www/FlaskApp/ItemCatalog/ItemCatalog.wsgi
+   <Directory /var/www/FlaskApp/ItemCatalog/>
+       Require all granted
+   </Directory>
+   Alias /static /var/www/FlaskApp/ItemCatalog/static
+   <Directory /var/www/FlaskApp/ItemCatalog/static/>
+       Require all granted
+   </Directory>
+   ErrorLog ${APACHE_LOG_DIR}/error.log
+   LogLevel warn
+   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
 
+### 9. Create and configure the wsgi file for the new project
+`$ sudo nano /var/www/FlaskApp/ItemCatalog/ItemCatalog.wsgi`
+```
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0, "/var/www/FlaskApp/ItemCatalog/")
+sys.path.insert(1, "/var/www/FlaskApp/")
 
-* Install PostgreSQL server: `$ sudo apt-get install postgresql`.
-* Start PostgreSQL server as a permanent service: `$ sudo service postgresql start`.
-* Install SQLAlchemy database toolkit: `$ pip3 install sqlalchemy`.
-* Install Flask web development framework: `$ pip3 install flask`.
-* Install OAuth2 client for Google sign in: `$ pip3 install oauth2client`.
-* Install Httplib2 to access HTTP Layer: `$ pip3 install httplib2`.
+from ItemCatalog import app as application
+application.secret_key = "1234"
+```
 
-* Install Apache webserver: `$ sudo apt-get install apache2`
+### 10. Adjust python program
+* Rename main python file: `$ sudo mv project.py __init__.py`
+* Change Code:
+Before:
+```
+app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'
+#generated with os.urandom(16)
+app.debug = True
+app.run(host='0.0.0.0', port=8000)
+```
+After:
+```
+#app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'
+# generated with os.urandom(16)
+#app.debug = True
+#app.run(host='0.0.0.0', port=8000)
+app.run()
+ ```
+ 
+### 11. Enable the app on apache2
+* Enable new app: `$ sudo a2ensite ItemCatalog.conf`.
+```
+grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ sudo a2ensite ItemCatalog.conf
+Site ItemCatalog already enabled
+```
+* Disable default: `$ sudo a2dissite 000-default.conf`.
+```
+grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ sudo a2dissite 000-default.conf
+Site 000-default disabled.
+To activate the new configuration, you need to run:
+  systemctl reload apache2
+```
+### 12. Restart apache2 web server
+* sudo service apache2 reload
+* sudo service apache2 restart
 
-### 2. Test Apache web server
-* Open the following site on your local web browser: `http://52.59.65.120:80` 
- If the web server is running, the `Apache2 Ubuntu Default Page` is displayed.
 
-### 3. Clone the ItemCatalog from github to the server
-* `$ cd /home/grader`
-* `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
+### 13. Test the configuration
+* Open website in browser: `http://52.59.65.120.xip.io`
 
-### 4. Configure the web application
+
+
+### 8. Configure the web application
 * Open the project folder `$ cd /home/grader/ItemCatalog`.
 * Open the project.py file: `$ nano project.py`.
 * Change server ip and port: from `app.run(host='0.0.0.0', port=8000)` to `app.run(host='52.59.65.120', port=80)`.
 
-### 5. Run the web application
+### . Run the web application
 * Launch application: `$ python project.py`.
+:-(
+```
+Internal Server Error
+
+The server encountered an internal error or misconfiguration and was unable to complete your request.
+
+Please contact the server administrator at nici@nici.com to inform them of the time this error occurred, and the actions you performed just before this error.
+
+More information about this error may be available in the server error log.
+
+Apache/2.4.29 (Ubuntu) Server at 52.59.65.120.xip.io Port 80
+```
 
