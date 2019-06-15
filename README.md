@@ -15,6 +15,7 @@ FSWD Linux Server Configuration
 
 ## 3. My virtual server
 * Public IP-Address of the server instance: `52.59.65.120`.
+* Visit my webapp: `http://52.59.65.120.xip.io`
 * Initial user name: `ubuntu`.
 
 ## Setup the security
@@ -215,10 +216,7 @@ grader@52.59.65.120: Permission denied (publickey).
 ### 2. Test Apache web server
 * Open the following site on your local web browser: `http://52.59.65.120:80` 
  If the web server is running, the `Apache2 Ubuntu Default Page` is displayed.
-### 3. Install Postgres SQL server
-* Install PostgreSQL server: `$ sudo apt-get install postgresql`.
-* Start PostgreSQL server as a permanent service: `$ sudo service postgresql start`.
-### 4. Install Python
+### 3. Install Python and Virtualenv
 * Install Python 3.x or later: `$ sudo apt-get install python3`.
 * Check python version: `$ python --version`.
  ```
@@ -227,97 +225,102 @@ grader@52.59.65.120: Permission denied (publickey).
  ```
 * Install PIP for python3: `$ sudo apt install python3-pip`.
 * Install virtual enironments for python: `$ pip3 install virtualenv`.
-
-### 5. Clone the ItemCatalog from github to the server
-* Install git: `$ sudo apt-get install git-core`.
-* Open Apache default folder: `$ cd /var/www/`.
-* Create new forlder for the flask apps: `$ sudo mkdir FlaskApp`.
-* Download/Clone the ItemCatalog app from git: `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
-
-### 6. Create virtual environment
-
-`python3 -m venv venv`
-`(venv) grader@ip-172-26-0-126:/var/www/FlaskApp/FlaskApp/venv$ which python
-/var/www/FlaskApp/FlaskApp/venv/bin/python`
-
-* Open project folder: `$ cd /var/www/FlaskApp/ItemCatalog`.
-* Give write access to the folder: `$ sudo chown -R grader:grader /var/www/FlaskApp/ItemCatalog`
+### 4. Create and activate virtual environment
+* Open project folder: `$ cd /var/www/FlaskApp/FlaskApp`.
+* Give write access to the folder: `$ sudo chown -R grader:grader /var/www/FlaskApp/FlaskApp`
 * Give write access to the folder: `$ sudo chown -R grader:grader /var/www/FlaskApp`
-* Create virtual environment: `$ sudo virtualenv -p python3 venv`
+* Create virtual environment: `$ sudo virtualenv -p python3 venv3`
   ```
-  grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ virtualenv -p python3 venv
+  grader@ip-172-26-0-126:/var/www/FlaskApp/FlaskApp$ virtualenv -p python3 venv3
   Already using interpreter /usr/bin/python3
   Using base prefix '/usr'
-  New python executable in /var/www/FlaskApp/ItemCatalog/venv/bin/python3
-  Also creating executable in /var/www/FlaskApp/ItemCatalog/venv/bin/python
+  New python executable in /var/www/FlaskApp/FlaskApp/venv/bin/python3
+  Also creating executable in /var/www/FlaskApp/FlaskApp/venv/bin/python
   Installing setuptools, pip, wheel...
   done.
   ```
- * Activate the virtual environment: `$ source venv/bin/activate`.
+ * Activate the virtual environment: `$ source venv3/bin/activate`.
   ```
- grader@ip-172-26-0-126:~/ItemCatalog$ source venv/bin/activate
- (venv) grader@ip-172-26-0-126:~/ItemCatalog$ 
+ grader@ip-172-26-0-126:~/FlaskApp$ source venv3/bin/activate
+ (venv3) grader@ip-172-26-0-126:~/FlaskApp$ 
  ```
  * Check if the correct virtual environement is active: `$ which python´.
  ```
- (venv) grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ which python
- /var/www/FlaskApp/ItemCatalog/venv/bin/python
- (venv) grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ 
+ (venv3) grader@ip-172-26-0-126:/var/www/FlaskApp/FlaskApp$ which python
+ /var/www/FlaskApp/FlaskApp/venv/bin/python
+ (venv3) grader@ip-172-26-0-126:/var/www/FlaskApp/FlaskApp$ 
  ```
- 
- ### 7. Install python packages
+ ### 5. Install python packages
 * Install SQLAlchemy database toolkit: `$ pip install sqlalchemy`.
 * Install Flask web development framework: `$ pip install flask`.
 * Install OAuth2 client for Google sign in: `$ pip install oauth2client`.
 * Install Httplib2 to access HTTP Layer: `$ pip install httplib2`.
-* Install Requests for easy HTTP messages: `$ pip install requests`.
+* Install Requests for easy HTTP messages: `$ pip install requests`. 
+### 6. Get Flask running on the web server 
+* Set up the wsgi file: `sudo nano /var/www/FlaskApp/flaskapp.wsgi`.
+ ```
+ activate_this = '/var/www/FlaskApp/FlaskApp/venv3/bin/activate_this.py'
+ with open(activate_this) as file_:
+     exec(file_.read(), dict(__file__=activate_this))
 
+ import sys
+ import logging
+ logging.basicConfig(stream=sys.stderr)
+ sys.path.insert(0,"/var/www/FlaskApp/")
 
-### 8. Configure the virtual apache host
-`sudo nano /etc/apache2/sites-available/ItemCatalog.conf`
+ from FlaskApp import app as application
+ application.secret_key = 'Add your secret key'
+ ```
+* Configure the virtual apache host: `sudo nano /etc/apache2/sites-available/FlaskApp.conf` 
+ ```
+ <VirtualHost *:80>
+     ServerName 52.59.65.120
+     ServerAlias 52.59.65.120.xip.io
+     ServerAdmin nici@52.59.65.120.xip.io
+     WSGIDaemonProcess FlaskApp python-path=/var/www/FlaskApp:/var/www/FlaskApp/FlaskApp/venv3/lib/python3.6/site-packages
+     WSGIProcessGroup FlaskApp
+     WSGIScriptAlias / /var/www/FlaskApp/flaskapp.wsgi
+     <Directory /var/www/FlaskApp/FlaskApp/>
+         Order allow,deny
+         Allow from all
+     </Directory>
+     Alias /static /var/www/FlaskApp/FlaskApp/static
+     <Directory /var/www/FlaskApp/FlaskApp/static/>
+         Order allow,deny
+         Allow from all
+     </Directory>
+     ErrorLog ${APACHE_LOG_DIR}/error.log
+     LogLevel warn
+     CustomLog ${APACHE_LOG_DIR}/access.log combined
+ </VirtualHost>
+ ```
+* Create a test flask application: `sudo nano /var/www/FlaskApp/FlaskApp/__init__.py`
+ ```
+ from flask import Flask
+ app = Flask(__name__)
+ @app.route("/")
+ def hello():
+     return "Hello, I love Digital Ocean!"
+ if __name__ == "__main__":
+     app.run()
+ ```
+* Test the configuration via your browser: `http://52.59.65.120.xip.io`.
 ```
-<VirtualHost *:80>
-   ServerName 52.59.65.120
-   ServerAlias 52.59.65.120.xip.io
-   ServerAdmin nici@nici.com
-   WSGIScriptAlias / /var/www/FlaskApp/ItemCatalog/ItemCatalog.wsgi
-   <Directory /var/www/FlaskApp/ItemCatalog/>
-       Require all granted
-   </Directory>
-   Alias /static /var/www/FlaskApp/ItemCatalog/static
-   <Directory /var/www/FlaskApp/ItemCatalog/static/>
-       Require all granted
-   </Directory>
-   ErrorLog ${APACHE_LOG_DIR}/error.log
-   LogLevel warn
-   CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
+Hello, I love Digital Ocean!
 ```
+Test result: successful!
 
-### 9. Create and configure the wsgi file for the new project
-`$ sudo nano /var/www/FlaskApp/ItemCatalog.wsgi`
-```
-import sys
-import logging
-logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, "/var/www/FlaskApp/ItemCatalog/")
-sys.path.insert(1, "/var/www/FlaskApp/")
+### 7. Clone the ItemCatalog from github to the server
+* Install git: `$ sudo apt-get install git-core`.
+* Open Apache default folder: `$ cd /var/www/`.
+* Create new forlder for the flask apps: `$ sudo mkdir FlaskApp`.
+* Open FlaskApp folder: `cd FlaskApp`.
+* Download/Clone the ItemCatalog app from git: `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
+* Rename folder ItemCatalog to FlaskApp: `mv -r ItemCatalog FlaskApp`.
 
-from ItemCatalog import app as application
-application.secret_key = "1234"
-```
-
-### 10. Adjust python program
+### 8. Adjust python program
 * Rename main python file: `$ sudo mv project.py __init__.py`
 * Change Code:
-Before:
-```
-app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'
-#generated with os.urandom(16)
-app.debug = True
-app.run(host='0.0.0.0', port=8000)
-```
-After:
 ```
 #app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'
 # generated with os.urandom(16)
@@ -325,8 +328,7 @@ After:
 #app.run(host='0.0.0.0', port=8000)
 app.run()
  ```
- 
-### 11. Enable the app on apache2
+### 9. Enable the app on apache2
 * Enable new app: `$ sudo a2ensite ItemCatalog.conf`.
 ```
 grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ sudo a2ensite ItemCatalog.conf
@@ -339,27 +341,47 @@ Site 000-default disabled.
 To activate the new configuration, you need to run:
   systemctl reload apache2
 ```
-### 12. Restart apache2 web server
-* sudo service apache2 reload
-* sudo service apache2 restart
+### 10. Install and config Postgres SQL server
+> Is it not possbile to reuse the existing data base from the previous project?
+* Install PostgreSQL server: `$ sudo apt-get install postgresql`.
+* Start PostgreSQL server as a permanent service: `$ sudo service postgresql start`.
+* Login as user "postgres" `sudo su - postgres
+* Get into postgreSQL shell `psql`
+* Create a new database named catalog  and create a new user named catalog in postgreSQL shell
+	```
+	postgres=# CREATE DATABASE catalog;
+	postgres=# CREATE USER catalog;
+	```
+* Set a password for user catalog
+	```
+	postgres=# ALTER ROLE catalog WITH PASSWORD '1234';
+	```
+* Give user "catalog" permission to "catalog" application database
+	```
+	postgres=# GRANT ALL PRIVILEGES ON DATABASE catalog TO catalog;
+	```
+* Quit postgreSQL: `postgres=# \q`
+* Exit from user "postgres": `$ exit`
 
+### 11. Initialize the new database
+* Rename `project.py` to `__init__.py` using `sudo mv website.py __init__.py`, if `__init__.py` not present.
+* Edit `database_setup.py` and `__init__.py` and `db_test_data.py` to change `engine = create_engine('sqlite:///catalog.db')` to `engine = create_engine('postgresql://catalog:1234@localhost/catalog')`,
+* Create database schema: `$ python database_setup.py`
+* Fill database: `$ pip install db_test_data.py`
+
+### 12. Restart apache2 web server
+* `$ sudo service apache2 reload`
+* `$ sudo service apache2 restart
 
 ### 13. Test the configuration
 * Open website in browser: `http://52.59.65.120.xip.io`
 
-:-(
-```
-Internal Server Error
-
-The server encountered an internal error or misconfiguration and was unable to complete your request.
-
-Please contact the server administrator at nici@nici.com to inform them of the time this error occurred, and the actions you performed just before this error.
-
-More information about this error may be available in the server error log.
-
-Apache/2.4.29 (Ubuntu) Server at 52.59.65.120.xip.io Port 80
-```
-
 ### 14. Check the server log
-`$ sudo tail /var/log/apache2/error.log
+`$ sudo tail /var/log/apache2/error.log`
 
+
+# Reference
+* https://github.com/jungleBadger/-nanodegree-linux-server-troubleshoot/tree/master/python3%2Bvenv%2Bwsgi
+* http://flask.pocoo.org/docs/1.0/deploying/mod_wsgi/
+* https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps
+* https://github.com/adityamehra/udacity-linux-server-configuration
