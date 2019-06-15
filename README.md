@@ -235,8 +235,14 @@ grader@52.59.65.120: Permission denied (publickey).
 * Download/Clone the ItemCatalog app from git: `$ git clone https://github.com/NicolNarciso/ItemCatalog`.
 
 ### 6. Create virtual environment
+
+`python3 -m venv venv`
+`(venv) grader@ip-172-26-0-126:/var/www/FlaskApp/FlaskApp/venv$ which python
+/var/www/FlaskApp/FlaskApp/venv/bin/python`
+
 * Open project folder: `$ cd /var/www/FlaskApp/ItemCatalog`.
 * Give write access to the folder: `$ sudo chown -R grader:grader /var/www/FlaskApp/ItemCatalog`
+* Give write access to the folder: `$ sudo chown -R grader:grader /var/www/FlaskApp`
 * Create virtual environment: `$ sudo virtualenv -p python3 venv`
   ```
   grader@ip-172-26-0-126:/var/www/FlaskApp/ItemCatalog$ virtualenv -p python3 venv
@@ -289,7 +295,7 @@ grader@52.59.65.120: Permission denied (publickey).
 ```
 
 ### 9. Create and configure the wsgi file for the new project
-`$ sudo nano /var/www/FlaskApp/ItemCatalog/ItemCatalog.wsgi`
+`$ sudo nano /var/www/FlaskApp/ItemCatalog.wsgi`
 ```
 import sys
 import logging
@@ -353,4 +359,7 @@ More information about this error may be available in the server error log.
 
 Apache/2.4.29 (Ubuntu) Server at 52.59.65.120.xip.io Port 80
 ```
+
+### 14. Check the server log
+`$ sudo tail /var/log/apache2/error.log
 
