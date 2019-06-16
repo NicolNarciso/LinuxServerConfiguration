@@ -320,14 +320,18 @@ Test result: successful!
 
 ### 8. Adjust python program
 * Rename main python file: `$ sudo mv project.py __init__.py`
-* Change Code:
+* Change `__init__.py`: `database_setup import Item, User, Category` to `from FlaskApp.database_setup import Item, User, Category`
+Change `__init__.py`: `CLIENT_SECRET_FILE_NAME = 'client_secret_apps.googleusercontent.com.json'` to `CLIENT_SECRET_FILE_NAME = '//var//www//FlaskApp//FlaskApp//client_secret_apps.googleusercontent.com.json'`
+* Change `__init__.py`:
 ```
 #app.secret_key = b'ub\xcd\x83\xa5f\xf9}\xfe\xa9\xd6\xe0\x04|\xc3\xd2'
 # generated with os.urandom(16)
 #app.debug = True
 #app.run(host='0.0.0.0', port=8000)
 app.run()
- ```
+```
+* Change `database_setup.py` and `__init__.py` and `db_test_data.py`: `engine = create_engine('sqlite:///catalog.db')` to `engine = create_engine('postgresql://catalog:1234@localhost/catalog')`
+
 ### 9. Enable the app on apache2
 * Enable new app: `$ sudo a2ensite ItemCatalog.conf`.
 ```
@@ -364,9 +368,19 @@ To activate the new configuration, you need to run:
 * Exit from user "postgres": `$ exit`
 
 ### 11. Initialize the new database
-* Rename `project.py` to `__init__.py` using `sudo mv website.py __init__.py`, if `__init__.py` not present.
-* Edit `database_setup.py` and `__init__.py` and `db_test_data.py` to change `engine = create_engine('sqlite:///catalog.db')` to `engine = create_engine('postgresql://catalog:1234@localhost/catalog')`,
 * Create database schema: `$ python database_setup.py`
+* Fill database: `$ pip install db_test_data.py`
+
+### 12. Update the outh2 configuration for google signin:
+* Open website `https://console.developers.google.com/apis/credentials`.
+* Go to APIs&Services->Credentials->ItemCatalogClientiD.
+* Add `xip.io` to the list of authorized domains.
+* Add `http://52.59.65.120.xip.io` to Authorized JavaScript origins.
+* Add `http://52.59.65.120.xip.io/oauth2callback` to Authorized redirect URIs.
+* Add `http://52.59.65.120.xip.io/login` to Authorized redirect URIs.
+* Add `http://52.59.65.120.xip.io/gconnect` to Authorized redirect URIs.
+
+* Fill database: `$ pip install db_test_data.py`
 * Fill database: `$ pip install db_test_data.py`
 
 ### 12. Restart apache2 web server
